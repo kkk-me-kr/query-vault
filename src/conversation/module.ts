@@ -4,12 +4,15 @@ import { CreateConversationUseCase } from './application/create-conversation.use
 import { CreateTurnUseCase } from './application/create-turn.use-case';
 import { ConversationService } from './domain/service';
 import { ConversationRepository } from './domain/abstract.repository';
-// import { ConverstaionTypeOrmRepository } from './infrastructure/persistence/typeorm.repository';
+import { ConversationTypeOrmRepository } from './infrastructure/persistence/typeorm.repository';
 import { GetUserConversationsUseCase } from './application/get-user-conversations.use-case';
-import { ConverstaionInmemoryRepository } from './infrastructure/persistence/inmemory.repository';
 import { GetQuestionsUseCase } from './application/get-questions.use-case';
 import { GetAnswersUseCase } from './application/get-answers.use-case';
 import { GetTurnPairsUseCase } from './application/get-turn-pairs.use-case';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Conversation } from './domain/entities/conversation.entity';
+import { Question } from './domain/entities/question.entity';
+import { Answer } from './domain/entities/answer.entity';
 
 const useCases = [
 	GetUserConversationsUseCase,
@@ -25,13 +28,12 @@ const domainServices = [ConversationService];
 const repositories = [
 	{
 		provide: ConversationRepository,
-		// useClass: ConverstaionTypeOrmRepository,
-		useClass: ConverstaionInmemoryRepository,
+		useClass: ConversationTypeOrmRepository,
 	},
 ];
 
 @Module({
-	imports: [],
+	imports: [TypeOrmModule.forFeature([Conversation, Question, Answer])],
 	controllers: [ConversationController],
 	providers: [...useCases, ...domainServices, ...repositories],
 	exports: [],

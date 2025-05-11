@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { Answer } from './entities/answer.entity';
 import {
 	Conversation,
@@ -5,6 +6,7 @@ import {
 } from './entities/conversation.entity';
 import { Question } from './entities/question.entity';
 
+@Injectable()
 export abstract class ConversationRepository {
 	abstract create(
 		userId: string,

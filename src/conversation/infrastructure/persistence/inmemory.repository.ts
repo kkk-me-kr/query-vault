@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { Answer } from '@/conversation/domain/entities/answer.entity';
 import {
 	Conversation,
@@ -8,7 +9,7 @@ import { ConversationRepository } from '@/conversation/domain/abstract.repositor
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ConverstaionInmemoryRepository implements ConversationRepository {
+export class ConversationInmemoryRepository implements ConversationRepository {
 	conversations: Conversation[] = [];
 	questions: Question[] = [];
 	answers: Answer[] = [];
