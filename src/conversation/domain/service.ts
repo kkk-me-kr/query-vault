@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConversationRepository } from './abstract.repository';
+import { ConversationRepository } from './repository';
 import { Conversation } from './entities/conversation.entity';
 import { Question } from './entities/question.entity';
 import { Answer } from './entities/answer.entity';

@@ -7,7 +7,7 @@ import {
 } from '@/conversation/domain/entities/conversation.entity';
 import { Question } from '@/conversation/domain/entities/question.entity';
 import { Answer } from '@/conversation/domain/entities/answer.entity';
-import { ConversationRepository } from '@/conversation/domain/abstract.repository';
+import { ConversationRepository } from '@/conversation/domain/repository';
 
 @Injectable()
 export class ConversationTypeOrmRepository extends ConversationRepository {

@@ -5,7 +5,7 @@ import {
 	ConversationStatus,
 } from '@/conversation/domain/entities/conversation.entity';
 import { Question } from '@/conversation/domain/entities/question.entity';
-import { ConversationRepository } from '@/conversation/domain/abstract.repository';
+import { ConversationRepository } from '@/conversation/domain/repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -60,7 +60,6 @@ export class ConversationInmemoryRepository implements ConversationRepository {
 	}
 
 	async findByUserId(userId: string): Promise<Conversation[]> {
-		console.log(this.conversations, this.answers, this.questions);
 		return this.conversations.filter(
 			conversation => conversation.userId === userId,
 		);

@@ -4,8 +4,9 @@ import { AppService } from '@/app.service';
 import { ConversationModule } from './conversation/module';
 import { TypeOrmConfigModule } from './shared/persistence/typeorm.module';
 import { ConfigModule } from '@nestjs/config';
+import { DocumentModule } from './document/module';
 
-const domainModules = [ConversationModule];
+const domainModules = [ConversationModule, DocumentModule];
 
 const sharedModules = [TypeOrmConfigModule];
 

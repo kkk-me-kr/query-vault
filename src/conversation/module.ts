@@ -3,7 +3,7 @@ import { ConversationController } from './interface/http/controller';
 import { CreateConversationUseCase } from './application/create-conversation.use-case';
 import { CreateTurnUseCase } from './application/create-turn.use-case';
 import { ConversationService } from './domain/service';
-import { ConversationRepository } from './domain/abstract.repository';
+import { ConversationRepository } from './domain/repository';
 import { ConversationTypeOrmRepository } from './infrastructure/persistence/typeorm.repository';
 import { GetUserConversationsUseCase } from './application/get-user-conversations.use-case';
 import { GetQuestionsUseCase } from './application/get-questions.use-case';
