@@ -53,6 +53,7 @@ export class ConversationTypeOrmRepository extends ConversationRepository {
 	): Promise<void> {
 		const answer = new Answer();
 		answer.conversationId = conversationId;
+		answer.turn = turn;
 		answer.content = content;
 		await this.answerRepository.save(answer);
 	}
