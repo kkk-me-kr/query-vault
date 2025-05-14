@@ -15,7 +15,7 @@ import { DocumentTypeRepository } from './domain/repositories/document-type.repo
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Document } from './domain/entities/document.entity';
 import { DocumentType } from './domain/entities/document-type.entity';
-import { CreateDocumentChunkUseCase } from './application/create-document-chunk.use-case';
+import { PutDocumentChunkUseCase } from './application/put-document-chunk.use-case';
 import { RetrieveAllDocumentUseCase } from './application/retrieve-all-document.use-case';
 import { DeleteDocumentUseCase } from './application/delete-document.use-case';
 import { LlmModule } from '@/shared/services/llm/module';
@@ -23,7 +23,7 @@ import { LlmModule } from '@/shared/services/llm/module';
 const useCases = [
 	CreateDocumentUseCase,
 	CreateDocumentTypeUseCase,
-	CreateDocumentChunkUseCase,
+	PutDocumentChunkUseCase,
 	RetrieveAllDocumentUseCase,
 	DeleteDocumentUseCase,
 ];

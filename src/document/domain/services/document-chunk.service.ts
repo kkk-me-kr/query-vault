@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
 	DocumentChunkRepository,
 	QueriedChunkType,
@@ -17,6 +17,10 @@ export class DocumentChunkService {
 			embedding: number[];
 		}[],
 	): Promise<void> {
+		if (await this.documentChunkRepository.checkChunkExists(documentId)) {
+			throw new BadRequestException('Document chunks already exist');
+		}
+
 		let index = 0;
 		for (const chunk of chunkedData) {
 			await this.documentChunkRepository.create(

@@ -23,4 +23,5 @@ export abstract class DocumentChunkRepository {
 		topK: number,
 	): Promise<QueriedChunkType[]>;
 	abstract deleteByDocumentId(documentId: number): Promise<void>;
+	abstract checkChunkExists(documentId: number): Promise<boolean>;
 }

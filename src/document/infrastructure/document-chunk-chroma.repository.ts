@@ -4,7 +4,6 @@ import {
 	DocumentChunkRepository,
 	QueriedChunkType,
 } from '../domain/repositories/document-chunk.repository';
-import { DocumentChunk } from '../domain/entities/document-chunk.entity';
 
 @Injectable()
 export class DocumentChunkChromaRepository
@@ -203,5 +202,14 @@ export class DocumentChunkChromaRepository
 			nResults: topK,
 		});
 		return results;
+	}
+
+	async checkChunkExists(documentId: number): Promise<boolean> {
+		const results = await this.collection.get({
+			where: {
+				documentId,
+			},
+		});
+		return results.ids.length > 0;
 	}
 }

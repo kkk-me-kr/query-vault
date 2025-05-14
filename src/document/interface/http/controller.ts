@@ -6,6 +6,7 @@ import {
 	Param,
 	ParseIntPipe,
 	Post,
+	Put,
 	Query,
 	UploadedFile,
 	UseInterceptors,
@@ -14,7 +15,7 @@ import { CreateDocumentUseCase } from '../../application/create-document.use-cas
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { CreateDocumentTypeDto } from './dto/create-document-type.dto';
 import { CreateDocumentTypeUseCase } from '@/document/application/create-document-type.use-case';
-import { CreateDocumentChunkUseCase } from '@/document/application/create-document-chunk.use-case';
+import { PutDocumentChunkUseCase } from '@/document/application/put-document-chunk.use-case';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RetrieveAllDocumentUseCase } from '@/document/application/retrieve-all-document.use-case';
 import { DeleteDocumentUseCase } from '@/document/application/delete-document.use-case';
@@ -23,7 +24,7 @@ export class DocumentController {
 	constructor(
 		private readonly createDocumentUseCase: CreateDocumentUseCase,
 		private readonly createDocumentTypeUseCase: CreateDocumentTypeUseCase,
-		private readonly createDocumentChunkUseCase: CreateDocumentChunkUseCase,
+		private readonly putDocumentChunkUseCase: PutDocumentChunkUseCase,
 		private readonly retrieveAllDocumentUseCase: RetrieveAllDocumentUseCase,
 		private readonly deleteDocumentUseCase: DeleteDocumentUseCase,
 	) {}
@@ -49,12 +50,12 @@ export class DocumentController {
 		return this.createDocumentTypeUseCase.execute(body.name, body.description);
 	}
 
-	@Post(':id/chunks')
+	@Put(':id/chunks')
 	async createChunk(
 		@Param('id', ParseIntPipe) id: number,
 		@Body('seperators') seperators?: string[],
 	) {
-		return this.createDocumentChunkUseCase.execute(id, seperators);
+		return this.putDocumentChunkUseCase.execute(id, seperators);
 	}
 
 	@Get('retrieve')

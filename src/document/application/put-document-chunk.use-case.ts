@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentChunkRepository } from '../domain/repositories/document-chunk.repository';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { DocumentChunkService } from '../domain/services/document-chunk.service';
 import { DocumentService } from '../domain/services/document.service';
 import { EmbeddingService } from '@/shared/services/embedding/service';
 
 @Injectable()
-export class CreateDocumentChunkUseCase {
+export class PutDocumentChunkUseCase {
 	constructor(
 		private readonly documentService: DocumentService,
 		private readonly documentChunkService: DocumentChunkService,
@@ -49,6 +48,9 @@ export class CreateDocumentChunkUseCase {
 				};
 			}),
 		);
+		// NOTE: 기존에 청크가 있는 경우 삭제될겁니다.
+		await this.documentChunkService.deleteDocumentChunks(documentId);
+
 		await this.documentChunkService.createDocumentChunks(
 			documentId,
 			chunckedData,
