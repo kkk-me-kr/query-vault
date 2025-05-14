@@ -39,7 +39,7 @@ export class PutDocumentChunkUseCase {
 		let chunkTexts = await textSplitter.splitText(document.content);
 		// NOTE: 청크 접두사를 추가합니다.
 		if (chunkPrefix) {
-			chunkTexts = chunkTexts.map(chunk => chunk + ' ' + chunkPrefix);
+			chunkTexts = chunkTexts.map(chunk => chunkPrefix + ' ' + chunk);
 		}
 
 		const chunckedData = await Promise.all(
