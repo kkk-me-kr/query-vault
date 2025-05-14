@@ -22,12 +22,14 @@ export class RetrieveAllDocumentUseCase {
 		const similarChunks =
 			await this.documentChunkService.findSimilarChunksInAllDocuments(
 				[Array.from(embedding)],
-				10,
+				5,
 			);
-		// NOTE: 검색이 너무 안되면 0.5로 조정
-		const highlySimilarChunks = similarChunks.filter(
-			chunk => chunk.distance && chunk.distance <= 1,
-		);
+
+		// TODO: distance가 생각보다 높은 경우가 많아 필터링을 제거하고 topK를 낮춤, 추후 조정 필요
+		const highlySimilarChunks = similarChunks;
+		// similarChunks.filter(
+		// 	chunk => chunk.distance && chunk.distance <= 0.5,
+		// );
 
 		if (highlySimilarChunks.length === 0) {
 			return [];

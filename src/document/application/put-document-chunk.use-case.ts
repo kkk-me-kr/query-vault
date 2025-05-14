@@ -15,36 +15,31 @@ export class PutDocumentChunkUseCase {
 	async execute(
 		documentId: number,
 		{
-			seperators,
+			chunkPrefix,
 			metadata,
-		}: { seperators?: string[]; metadata?: Record<string, any> },
+		}: { chunkPrefix?: string; metadata?: Record<string, any> },
 	) {
 		const document = await this.documentService.findDocument(documentId);
 		if (!document) {
 			throw new NotFoundException('Document not found');
 		}
 
-		const chunkSize = 300;
+		const chunkSize = 1500;
 		const chunkOverlap = chunkSize * 0.2;
-		let chunkTexts: string[];
-		// NOTE: 구분자가 명확히 있는 경우 구분자를 기준으로 자르고, 없는 경우 최대 청크 사이즈 기준 재귀적으로 자른다.
-		if (seperators && seperators.length > 0) {
-			chunkTexts = document.content.split(
-				new RegExp(seperators.join('|'), 'g'),
-			);
-		} else {
-			const textSplitter = new RecursiveCharacterTextSplitter({
-				chunkSize,
-				chunkOverlap,
-				// chunkOverlap,
-				separators: [
-					...RecursiveCharacterTextSplitter.getSeparatorsForLanguage(
-						'markdown',
-					),
-				],
-				keepSeparator: true,
-			});
-			chunkTexts = await textSplitter.splitText(document.content);
+
+		const textSplitter = new RecursiveCharacterTextSplitter({
+			chunkSize,
+			chunkOverlap,
+			separators: [
+				...RecursiveCharacterTextSplitter.getSeparatorsForLanguage('markdown'),
+			],
+			keepSeparator: true,
+		});
+
+		let chunkTexts = await textSplitter.splitText(document.content);
+		// NOTE: 청크 접두사를 추가합니다.
+		if (chunkPrefix) {
+			chunkTexts = chunkTexts.map(chunk => chunk + ' ' + chunkPrefix);
 		}
 
 		const chunckedData = await Promise.all(
@@ -60,6 +55,8 @@ export class PutDocumentChunkUseCase {
 				};
 			}),
 		);
+
+		console.log(chunckedData);
 		// NOTE: 기존에 청크가 있는 경우 삭제될겁니다.
 		await this.documentChunkService.deleteDocumentChunks(documentId);
 

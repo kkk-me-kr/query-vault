@@ -57,8 +57,8 @@ export class DocumentController {
 		@Body() body: PutDocumentChunkDto,
 	) {
 		return this.putDocumentChunkUseCase.execute(id, {
-			seperators: body.seperators,
 			metadata: body.metadata,
+			chunkPrefix: body.chunkPrefix,
 		});
 	}
 
