@@ -1,0 +1,22 @@
+Context (each item has text + optional metadata):
+{{#each contexts}}
+	- Text:
+	{{this.text}}
+	{{#if this.metadata}}
+		Metadata:
+		{{#each this.metadata}}
+			•
+			{{@key}}
+			=
+			{{this}}{{#unless @last}},{{/unless}}
+		{{/each}}
+	{{/if}}
+{{/each}}
+
+Question:
+{{question}}
+
+Please provide a **concise, accurate answer** in the **same language** as the
+question, strictly based on the above context. You may refer to the metadata
+(e.g., source, type, section) to judge relevance or reliability, but do **NOT**
+disclose any information not contained in the provided context.

@@ -2,7 +2,6 @@ import { DocumentService } from '../domain/services/document.service';
 import { EmbeddingService } from '@/shared/services/embedding/service';
 import { DocumentChunkService } from '../domain/services/document-chunk.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-
 @Injectable()
 export class RetrieveAllDocumentUseCase {
 	constructor(

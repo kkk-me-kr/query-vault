@@ -75,8 +75,8 @@ export class DocumentChunkChromaRepository
 					documentId,
 					index: chunkIndex,
 					content,
-					extraMetadata,
 					distance: distances[index],
+					metadata: extraMetadata,
 				};
 			});
 			results = chunks;
@@ -139,7 +139,7 @@ export class DocumentChunkChromaRepository
 				documentId,
 				index: chunkIndex,
 				content,
-				extraMetadata,
+				metadata: extraMetadata,
 			};
 		});
 	}

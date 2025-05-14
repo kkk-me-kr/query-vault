@@ -18,6 +18,7 @@ import { DocumentType } from './domain/entities/document-type.entity';
 import { CreateDocumentChunkUseCase } from './application/create-document-chunk.use-case';
 import { RetrieveAllDocumentUseCase } from './application/retrieve-all-document.use-case';
 import { DeleteDocumentUseCase } from './application/delete-document.use-case';
+import { LlmModule } from '@/shared/services/llm/module';
 
 const useCases = [
 	CreateDocumentUseCase,
@@ -52,6 +53,7 @@ const repositories = [
 	imports: [
 		TypeOrmModule.forFeature([Document, DocumentType]),
 		EmbeddingModule,
+		LlmModule,
 	],
 	providers: [...useCases, ...domainServices, ...repositories],
 	controllers: [DocumentController],

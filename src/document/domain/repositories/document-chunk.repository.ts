@@ -2,7 +2,6 @@ import { DocumentChunk } from '../entities/document-chunk.entity';
 
 export type QueriedChunkType = Omit<DocumentChunk, 'embedding'> & {
 	distance?: number;
-	extraMetadata?: Record<string, any> | null;
 };
 
 export abstract class DocumentChunkRepository {

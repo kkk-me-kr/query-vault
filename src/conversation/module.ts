@@ -13,7 +13,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Conversation } from './domain/entities/conversation.entity';
 import { Question } from './domain/entities/question.entity';
 import { Answer } from './domain/entities/answer.entity';
-
+import { DocumentModule } from '@/document/module';
+import { LlmModule } from '@/shared/services/llm/module';
 const useCases = [
 	GetUserConversationsUseCase,
 	CreateConversationUseCase,
@@ -33,7 +34,11 @@ const repositories = [
 ];
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Conversation, Question, Answer])],
+	imports: [
+		TypeOrmModule.forFeature([Conversation, Question, Answer]),
+		DocumentModule,
+		LlmModule,
+	],
 	controllers: [ConversationController],
 	providers: [...useCases, ...domainServices, ...repositories],
 	exports: [],
