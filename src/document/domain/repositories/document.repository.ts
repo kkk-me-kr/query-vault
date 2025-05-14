@@ -7,8 +7,8 @@ export abstract class DocumentRepository {
 		source: string,
 		documentTypeId?: number | null,
 	): Promise<void>;
-	abstract findById(id: number): Promise<Document>;
+	abstract findById(id: number): Promise<Document | null>;
 	abstract findAll(): Promise<Document[]>;
-	abstract update(document: Document): Promise<Document>;
+	abstract update(document: Document): Promise<void>;
 	abstract delete(id: number): Promise<void>;
 }

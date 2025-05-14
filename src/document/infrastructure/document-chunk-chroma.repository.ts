@@ -85,22 +85,22 @@ export class DocumentChunkChromaRepository
 
 	async create(
 		documentId: number,
-		index: number,
-		content: string,
-		embedding: number[],
-		metadata?: Record<string, any> | null,
+		chunks: {
+			index: number;
+			content: string;
+			embedding: number[];
+			metadata?: Record<string, any> | null;
+		}[],
 	): Promise<void> {
 		await this.collection.add({
-			ids: [`${documentId}-${index}`],
-			metadatas: [
-				{
-					documentId,
-					index,
-					...(metadata || {}),
-				},
-			],
-			documents: [content],
-			embeddings: [embedding],
+			ids: chunks.map(chunk => `${documentId}-${chunk.index}`),
+			metadatas: chunks.map(chunk => ({
+				documentId,
+				index: chunk.index,
+				...(chunk.metadata || {}),
+			})),
+			documents: chunks.map(chunk => chunk.content),
+			embeddings: chunks.map(chunk => chunk.embedding),
 		});
 	}
 

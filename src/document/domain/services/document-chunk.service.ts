@@ -12,25 +12,23 @@ export class DocumentChunkService {
 
 	async createDocumentChunks(
 		documentId: number,
-		chunkedData: {
+		chunks: {
 			content: string;
 			embedding: number[];
+			metadata?: Record<string, any> | null;
 		}[],
 	): Promise<void> {
 		if (await this.documentChunkRepository.checkChunkExists(documentId)) {
 			throw new BadRequestException('Document chunks already exist');
 		}
 
-		let index = 0;
-		for (const chunk of chunkedData) {
-			await this.documentChunkRepository.create(
-				documentId,
-				index,
-				chunk.content,
-				chunk.embedding,
-			);
-			index++;
-		}
+		const insertChunks = chunks.map((chunk, index) => ({
+			index,
+			content: chunk.content,
+			embedding: chunk.embedding,
+			metadata: chunk.metadata,
+		}));
+		await this.documentChunkRepository.create(documentId, insertChunks);
 	}
 
 	async deleteDocumentChunks(documentId: number): Promise<void> {

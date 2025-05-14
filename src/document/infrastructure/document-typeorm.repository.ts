@@ -27,9 +27,8 @@ export class DocumentTypeOrmRepository extends DocumentRepository {
 		await this.repository.save(document);
 	}
 
-	async findById(id: number): Promise<Document> {
+	async findById(id: number): Promise<Document | null> {
 		const doc = await this.repository.findOneBy({ id });
-		if (!doc) throw new Error('Document not found');
 		return doc;
 	}
 
@@ -37,9 +36,8 @@ export class DocumentTypeOrmRepository extends DocumentRepository {
 		return this.repository.find();
 	}
 
-	async update(document: Document): Promise<Document> {
+	async update(document: Document): Promise<void> {
 		await this.repository.update(document.id, document);
-		return this.findById(document.id);
 	}
 
 	async delete(id: number): Promise<void> {

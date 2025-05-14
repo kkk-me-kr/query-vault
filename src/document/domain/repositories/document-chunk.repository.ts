@@ -7,10 +7,12 @@ export type QueriedChunkType = Omit<DocumentChunk, 'embedding'> & {
 export abstract class DocumentChunkRepository {
 	abstract create(
 		documentId: number,
-		index: number,
-		content: string,
-		embedding: number[],
-		metadata?: Record<string, any> | null,
+		chunks: {
+			index: number;
+			content: string;
+			embedding: number[];
+			metadata?: Record<string, any> | null;
+		}[],
 	): Promise<void>;
 	abstract findByDocumentId(documentId: number): Promise<QueriedChunkType[]>;
 	abstract findSimilarInDocument(

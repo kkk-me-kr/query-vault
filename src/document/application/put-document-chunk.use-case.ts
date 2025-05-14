@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { DocumentChunkService } from '../domain/services/document-chunk.service';
 import { DocumentService } from '../domain/services/document.service';
@@ -12,8 +12,17 @@ export class PutDocumentChunkUseCase {
 		private readonly embeddingService: EmbeddingService,
 	) {}
 
-	async execute(documentId: number, seperators?: string[]) {
+	async execute(
+		documentId: number,
+		{
+			seperators,
+			metadata,
+		}: { seperators?: string[]; metadata?: Record<string, any> },
+	) {
 		const document = await this.documentService.findDocument(documentId);
+		if (!document) {
+			throw new NotFoundException('Document not found');
+		}
 
 		const chunkSize = 300;
 		const chunkOverlap = chunkSize * 0.2;
@@ -45,6 +54,9 @@ export class PutDocumentChunkUseCase {
 				return {
 					content: chunkText,
 					embedding: Array.from(embedding),
+					metadata: {
+						...(metadata || {}),
+					},
 				};
 			}),
 		);

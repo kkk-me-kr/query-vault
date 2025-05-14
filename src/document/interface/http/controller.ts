@@ -19,6 +19,7 @@ import { PutDocumentChunkUseCase } from '@/document/application/put-document-chu
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RetrieveAllDocumentUseCase } from '@/document/application/retrieve-all-document.use-case';
 import { DeleteDocumentUseCase } from '@/document/application/delete-document.use-case';
+import { PutDocumentChunkDto } from './dto/put-document-chunk.dto';
 @Controller('documents')
 export class DocumentController {
 	constructor(
@@ -51,11 +52,14 @@ export class DocumentController {
 	}
 
 	@Put(':id/chunks')
-	async createChunk(
+	async putChunk(
 		@Param('id', ParseIntPipe) id: number,
-		@Body('seperators') seperators?: string[],
+		@Body() body: PutDocumentChunkDto,
 	) {
-		return this.putDocumentChunkUseCase.execute(id, seperators);
+		return this.putDocumentChunkUseCase.execute(id, {
+			seperators: body.seperators,
+			metadata: body.metadata,
+		});
 	}
 
 	@Get('retrieve')

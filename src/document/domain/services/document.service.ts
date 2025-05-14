@@ -24,7 +24,7 @@ export class DocumentService {
 		);
 	}
 
-	async findDocument(id: number): Promise<Document> {
+	async findDocument(id: number): Promise<Document | null> {
 		return this.documentRepository.findById(id);
 	}
 

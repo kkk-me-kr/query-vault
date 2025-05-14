@@ -26,7 +26,7 @@ export class RetrieveAllDocumentUseCase {
 			);
 		// NOTE: 검색이 너무 안되면 0.5로 조정
 		const highlySimilarChunks = similarChunks.filter(
-			chunk => chunk.distance && chunk.distance <= 0.4,
+			chunk => chunk.distance && chunk.distance <= 1,
 		);
 
 		if (highlySimilarChunks.length === 0) {
@@ -43,6 +43,9 @@ export class RetrieveAllDocumentUseCase {
 			),
 		);
 		const result = documents.map(document => {
+			if (!document) {
+				return null;
+			}
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { content, ...rest } = document;
 			const matchedChunks = highlySimilarChunks.filter(
@@ -54,6 +57,6 @@ export class RetrieveAllDocumentUseCase {
 			};
 		});
 
-		return result;
+		return result.filter(result => result !== null);
 	}
 }
