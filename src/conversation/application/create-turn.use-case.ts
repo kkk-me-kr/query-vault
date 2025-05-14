@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConversationService } from '../domain/service';
 import { RetrieveAllDocumentUseCase } from '@/document/application/retrieve-all-document.use-case';
 import * as fs from 'fs';
@@ -59,6 +59,10 @@ export class CreateTurnUseCase {
 	}
 
 	async execute(conversationId: number, query: string) {
+		if (!(await this.conversationService.checkExists(conversationId))) {
+			throw new NotFoundException('Conversation not found');
+		}
+
 		const nextTurn =
 			await this.conversationService.findNextTurn(conversationId);
 

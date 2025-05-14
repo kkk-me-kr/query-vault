@@ -69,4 +69,9 @@ export class ConversationService {
 		);
 		return answer;
 	}
+
+	async checkExists(conversationId: number): Promise<boolean> {
+		const conversation = await this.repository.findById(conversationId);
+		return conversation !== null;
+	}
 }
