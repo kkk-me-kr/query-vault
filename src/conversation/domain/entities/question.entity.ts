@@ -18,7 +18,7 @@ export class Question {
 	@PrimaryColumn()
 	turn: number;
 
-	@Column()
+	@Column({ type: 'text' })
 	content: string;
 
 	@CreateDateColumn()
