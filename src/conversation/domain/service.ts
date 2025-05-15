@@ -70,6 +70,25 @@ export class ConversationService {
 		return answer;
 	}
 
+	async findAllTurns(conversationId: number): Promise<
+		{
+			question: Question;
+			answer: Answer | undefined;
+		}[]
+	> {
+		const questions =
+			await this.repository.findQuestionsByConversationId(conversationId);
+		const answers =
+			await this.repository.findAnswersByConversationId(conversationId);
+
+		const turns = questions.map(question => {
+			const answer = answers.find(answer => answer.turn === question.turn);
+			return { question, answer };
+		});
+
+		return turns;
+	}
+
 	async checkExists(conversationId: number): Promise<boolean> {
 		const conversation = await this.repository.findById(conversationId);
 		return conversation !== null;

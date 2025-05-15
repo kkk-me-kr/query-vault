@@ -6,6 +6,7 @@ import * as Handlebars from 'handlebars';
 import { LlmService } from '@/shared/services/llm/service';
 import { resolve } from 'path';
 import { ConfigService } from '@nestjs/config';
+import { QueriedChunkType } from '@/document/domain/repositories/document-chunk.repository';
 
 @Injectable()
 export class CreateTurnUseCase {
@@ -47,6 +48,21 @@ export class CreateTurnUseCase {
 		);
 	}
 
+	private async compressQuery(query: string) {
+		const queryCompressionSystemPrompt = this.queryCompressionSystemTemplate(
+			{},
+		);
+		const queryCompressionUserPrompt = this.queryCompressionUserTemplate({
+			question: query,
+		});
+		const compressedQuery = await this.llmService.generateAnswer(
+			queryCompressionSystemPrompt,
+			queryCompressionUserPrompt,
+			'gpt-4o-mini',
+		);
+		return compressedQuery;
+	}
+
 	getNearestDistanceOnRetrievedData(
 		retrievedData: Awaited<
 			ReturnType<typeof this.retrieveAllDocumentUseCase.execute>
@@ -68,26 +84,8 @@ export class CreateTurnUseCase {
 		const nextTurn =
 			await this.conversationService.findNextTurn(conversationId);
 
-		await this.conversationService.postQuestion(
-			conversationId,
-			nextTurn,
-			query,
-		);
-
 		// NOTE: 사용자의 질의문을 압축합니다.
-		const queryCompressionSystemPrompt = this.queryCompressionSystemTemplate(
-			{},
-		);
-		const queryCompressionUserPrompt = this.queryCompressionUserTemplate({
-			question: query,
-		});
-		console.log(`queryCompressing Start, original: ${query}`);
-		const compressedQuery = await this.llmService.generateAnswer(
-			queryCompressionSystemPrompt,
-			queryCompressionUserPrompt,
-			'gpt-4o-mini',
-		);
-		console.log(`queryCompressing End, compressed: ${compressedQuery}`);
+		const compressedQuery = await this.compressQuery(query);
 
 		const retrievedDataByQuery =
 			await this.retrieveAllDocumentUseCase.execute(query);
@@ -99,23 +97,42 @@ export class CreateTurnUseCase {
 			...retrievedDataByCompressedQuery,
 		];
 
-		const contexts = retrievedData.reduce((acc, cur) => {
-			const contexts = cur.matchedChunks.map(chunk => ({
-				text: chunk.content,
-				metadata: {
-					documentTitle: cur.title,
-					source: cur.source,
-					...chunk.metadata,
-				},
-			}));
+		const contexts = retrievedData.reduce(
+			(acc, cur) => {
+				// 중복 제거
+				const filteredChunks = cur.matchedChunks.filter(
+					chunk => !acc.find(context => context.text === chunk.content),
+				);
+				const contexts = filteredChunks.map(chunk => ({
+					text: chunk.content,
+					metadata: {
+						documentTitle: cur.title,
+						source: cur.source,
+						...chunk.metadata,
+					},
+				}));
 
-			return [...acc, ...contexts];
-		}, []);
+				return [...acc, ...contexts];
+			},
+			[] as {
+				text: string;
+				metadata: Record<string, any>;
+			}[],
+		);
 
 		if (contexts.length === 0) {
 			console.log('No contexts found', `query: ${query}`);
 			return 'I’m sorry, but I don’t have that information.';
 		}
+
+		const previousTurns =
+			await this.conversationService.findAllTurns(conversationId);
+		const previousTurnsPrompt = previousTurns.map(turn => {
+			return {
+				question: turn.question.content,
+				answer: turn.answer?.content,
+			};
+		});
 
 		const systemPrompt = this.systemTemplate({
 			subject: this.configService.get<string>('CONVERSATION_ANSWER_SUBJECT'),
@@ -124,17 +141,19 @@ export class CreateTurnUseCase {
 		const userPrompt = this.userTemplate({
 			contexts,
 			question: query,
+			previousTurns: previousTurnsPrompt,
 		});
-		console.log('systemPrompt', systemPrompt);
-		console.log('userPrompt', userPrompt);
-		console.log('systemPrompt length', systemPrompt.length);
-		console.log('userPrompt length', userPrompt.length);
 
 		const answer = await this.llmService.generateAnswer(
 			systemPrompt,
 			userPrompt,
 		);
 
+		await this.conversationService.postQuestion(
+			conversationId,
+			nextTurn,
+			query,
+		);
 		await this.conversationService.postAnswer(conversationId, nextTurn, answer);
 
 		return answer;

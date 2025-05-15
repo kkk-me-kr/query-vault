@@ -1,4 +1,16 @@
-Context (each item has text + optional metadata):
+Previous Conversation (each item has Q(Question), A(Answer)):
+{{#each previousTurns}}
+	- Q:
+	{{this.question}}
+	{{#if this.answer}}
+		- A:
+		{{this.answer}}
+	{{else}}
+		- A: (No answer provided)
+	{{/if}}
+{{/each}}
+
+your answer. Context (each item has text + optional metadata):
 {{#each contexts}}
 	- Text:
 	{{this.text}}
@@ -17,6 +29,7 @@ Question:
 {{question}}
 
 Please provide a **concise, accurate answer** in the **same language** as the
-question, strictly based on the above context. You may refer to the metadata
-(e.g., source, type, section) to judge relevance or reliability, but do **NOT**
+question, strictly based on the above context but also make sure to reference
+the previous conversation when relevant. You may refer to the metadata (e.g.,
+source, type, section) to judge relevance or reliability, but do **NOT**
 disclose any information not contained in the provided context.
