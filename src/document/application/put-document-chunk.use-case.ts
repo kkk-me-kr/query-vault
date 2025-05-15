@@ -33,7 +33,7 @@ export class PutDocumentChunkUseCase {
 			separators: [
 				...RecursiveCharacterTextSplitter.getSeparatorsForLanguage('markdown'),
 			],
-			keepSeparator: true,
+			keepSeparator: false,
 		});
 
 		let chunkTexts = await textSplitter.splitText(document.content);

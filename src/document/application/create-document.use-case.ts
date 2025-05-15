@@ -15,7 +15,8 @@ export class CreateDocumentUseCase {
 		let content: string;
 		if (dto.fileContent !== undefined) {
 			const fileType = dto.fileContent.mimetype;
-			if (fileType !== 'text/plain') {
+			// TODO: text외 pdf 등도 호환되도록 개선 필요
+			if (fileType !== 'text/plain' && fileType !== 'text/markdown') {
 				throw new BadRequestException('File type not supported');
 			}
 			content = dto.fileContent.buffer.toString('utf-8');
