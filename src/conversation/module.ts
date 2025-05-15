@@ -15,6 +15,8 @@ import { Question } from './domain/entities/question.entity';
 import { Answer } from './domain/entities/answer.entity';
 import { DocumentModule } from '@/document/module';
 import { LlmModule } from '@/shared/services/llm/module';
+import { ConfigModule } from '@nestjs/config';
+
 const useCases = [
 	GetUserConversationsUseCase,
 	CreateConversationUseCase,
@@ -38,6 +40,7 @@ const repositories = [
 		TypeOrmModule.forFeature([Conversation, Question, Answer]),
 		DocumentModule,
 		LlmModule,
+		ConfigModule,
 	],
 	controllers: [ConversationController],
 	providers: [...useCases, ...domainServices, ...repositories],

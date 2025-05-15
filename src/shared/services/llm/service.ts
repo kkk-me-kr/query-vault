@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
+import { OpenAI } from 'openai';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AVAILABLE_MODELS = {
 	'gpt-4.1': 'gpt-4.1',
 	'gpt-4.1-mini': 'gpt-4.1-mini',
@@ -11,60 +11,45 @@ const AVAILABLE_MODELS = {
 };
 type AvailableModel = keyof typeof AVAILABLE_MODELS;
 
-type OpenAiResponseData = {
-	choices: {
-		message: {
-			content: string;
-		};
-	}[];
-};
-
 @Injectable()
 export class LlmService {
-	private readonly apiUrl = 'https://api.openai.com/v1/chat/completions';
+	private readonly openai: OpenAI;
 
-	constructor(
-		private readonly httpService: HttpService,
-		private readonly configService: ConfigService,
-	) {}
+	constructor(private readonly configService: ConfigService) {
+		this.openai = new OpenAI({
+			apiKey: this.configService.getOrThrow<string>('OPENAI_API_KEY'),
+		});
+	}
 
 	async generateAnswer(
 		systemPrompt: string,
 		userPrompt: string,
 		model?: AvailableModel,
 	): Promise<string> {
-		const messages = [
-			{ role: 'system', content: systemPrompt },
-			{ role: 'user', content: userPrompt },
-		];
+		model =
+			model || this.configService.get<AvailableModel>('OPENAI_DEFAULT_MODEL');
 		if (!model) {
-			model = await this.configService.get('OPENAI_DEFAULT_MODEL');
-		}
-		if (!(model ?? '' in AVAILABLE_MODELS)) {
 			throw new Error(`Invalid model: ${model}`);
 		}
 
-		const response = await firstValueFrom(
-			this.httpService.post(
-				this.apiUrl,
-				{ model, messages },
-				{
-					headers: {
-						Authorization: `Bearer ${this.configService.get('OPENAI_API_KEY')}`,
-					},
-				},
-			),
-		);
+		const response = await this.openai.chat.completions.create({
+			model,
+			messages: [
+				{ role: 'system', content: systemPrompt },
+				{ role: 'user', content: userPrompt },
+			],
+			// NOTE: 결과를 당분간 지켜보기 위해 출력을 일정히 합니다.
+			temperature: 0,
+			presence_penalty: 0.0,
+			frequency_penalty: 0.0,
+			max_tokens: 1024,
+		});
 
-		if (response.status !== 200) {
-			throw new Error(`Error: ${response.statusText}`);
-		}
-
-		const data = response.data as OpenAiResponseData;
-		if (!data.choices?.[0]?.message?.content) {
+		const content = response.choices?.[0]?.message?.content;
+		if (!content) {
 			throw new Error('No response from OpenAI');
 		}
 
-		return data.choices[0].message.content.trim();
+		return content.trim();
 	}
 }

@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as Handlebars from 'handlebars';
 import { LlmService } from '@/shared/services/llm/service';
 import { resolve } from 'path';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CreateTurnUseCase {
@@ -17,9 +18,10 @@ export class CreateTurnUseCase {
 		private readonly conversationService: ConversationService,
 		private readonly llmService: LlmService,
 		private readonly retrieveAllDocumentUseCase: RetrieveAllDocumentUseCase,
+		private readonly configService: ConfigService,
 	) {
 		const systemTemplateSource = fs.readFileSync(
-			resolve('src/shared/prompts/rag-based-chat/system.md'),
+			resolve('src/shared/prompts/rag-based-chat/system.hbs'),
 			'utf-8',
 		);
 		const userTemplateSource = fs.readFileSync(
@@ -109,19 +111,24 @@ export class CreateTurnUseCase {
 
 			return [...acc, ...contexts];
 		}, []);
-		console.log(contexts);
 
 		if (contexts.length === 0) {
+			console.log('No contexts found', `query: ${query}`);
 			return 'I’m sorry, but I don’t have that information.';
 		}
 
-		const systemPrompt = this.systemTemplate({});
+		const systemPrompt = this.systemTemplate({
+			subject: this.configService.get<string>('CONVERSATION_ANSWER_SUBJECT'),
+			role: this.configService.get<string>('CONVERSATION_ANSWER_ROLE'),
+		});
 		const userPrompt = this.userTemplate({
 			contexts,
 			question: query,
 		});
-		console.log(systemPrompt);
-		console.log(userPrompt);
+		console.log('systemPrompt', systemPrompt);
+		console.log('userPrompt', userPrompt);
+		console.log('systemPrompt length', systemPrompt.length);
+		console.log('userPrompt length', userPrompt.length);
 
 		const answer = await this.llmService.generateAnswer(
 			systemPrompt,
