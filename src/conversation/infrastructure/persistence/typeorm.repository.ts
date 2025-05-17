@@ -113,7 +113,7 @@ export class ConversationTypeOrmRepository extends ConversationRepository {
 			where: { conversationId, turn },
 		});
 		const answer = await this.answerRepository.findOne({
-			where: { conversationId },
+			where: { conversationId, turn },
 		});
 		return { question, answer };
 	}
