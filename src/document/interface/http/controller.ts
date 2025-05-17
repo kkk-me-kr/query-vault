@@ -20,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RetrieveAllDocumentUseCase } from '@/document/application/retrieve-all-document.use-case';
 import { DeleteDocumentUseCase } from '@/document/application/delete-document.use-case';
 import { PutDocumentChunkDto } from './dto/put-document-chunk.dto';
+import { GetDocumentChunksUseCase } from '@/document/application/get-document-chunks.use-case';
 @Controller('documents')
 export class DocumentController {
 	constructor(
@@ -28,6 +29,7 @@ export class DocumentController {
 		private readonly putDocumentChunkUseCase: PutDocumentChunkUseCase,
 		private readonly retrieveAllDocumentUseCase: RetrieveAllDocumentUseCase,
 		private readonly deleteDocumentUseCase: DeleteDocumentUseCase,
+		private readonly getDocumentChunksUseCase: GetDocumentChunksUseCase,
 	) {}
 
 	@Post()
@@ -49,6 +51,11 @@ export class DocumentController {
 	@Post('types')
 	async createType(@Body() body: CreateDocumentTypeDto) {
 		return this.createDocumentTypeUseCase.execute(body.name, body.description);
+	}
+
+	@Get(':id/chunks')
+	async getChunks(@Param('id', ParseIntPipe) id: number) {
+		return this.getDocumentChunksUseCase.execute(id);
 	}
 
 	@Put(':id/chunks')

@@ -19,6 +19,7 @@ import { PutDocumentChunkUseCase } from './application/put-document-chunk.use-ca
 import { RetrieveAllDocumentUseCase } from './application/retrieve-all-document.use-case';
 import { DeleteDocumentUseCase } from './application/delete-document.use-case';
 import { LlmModule } from '@/shared/services/llm/module';
+import { GetDocumentChunksUseCase } from './application/get-document-chunks.use-case';
 
 const useCases = [
 	CreateDocumentUseCase,
@@ -26,6 +27,7 @@ const useCases = [
 	PutDocumentChunkUseCase,
 	RetrieveAllDocumentUseCase,
 	DeleteDocumentUseCase,
+	GetDocumentChunksUseCase,
 ];
 
 const domainServices = [
