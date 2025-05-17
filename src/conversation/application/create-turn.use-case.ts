@@ -144,7 +144,7 @@ export class CreateTurnUseCase {
 			previousTurns: previousTurnsPrompt,
 		});
 
-		const answer = await this.llmService.generateAnswer(
+		const answerContent = await this.llmService.generateAnswer(
 			systemPrompt,
 			userPrompt,
 		);
@@ -154,8 +154,21 @@ export class CreateTurnUseCase {
 			nextTurn,
 			query,
 		);
-		await this.conversationService.postAnswer(conversationId, nextTurn, answer);
+		await this.conversationService.postAnswer(
+			conversationId,
+			nextTurn,
+			answerContent,
+		);
 
-		return answer;
+		const { question, answer } =
+			await this.conversationService.findPairsByConversationTurn(
+				conversationId,
+				nextTurn,
+			);
+
+		return {
+			question,
+			answer,
+		};
 	}
 }

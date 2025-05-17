@@ -56,11 +56,8 @@ export class ConversationController {
 		return this.getAnswersUseCase.execute(id);
 	}
 
-	@Get(':id/:turn')
-	async getTurnPairs(
-		@Param('id', ParseIntPipe) id: number,
-		@Param('turn', ParseIntPipe) turn: number,
-	) {
-		return this.getTurnPairsUseCase.execute(id, turn);
+	@Get(':id/turns')
+	async getTurnPairs(@Param('id', ParseIntPipe) id: number) {
+		return this.getTurnPairsUseCase.execute(id);
 	}
 }

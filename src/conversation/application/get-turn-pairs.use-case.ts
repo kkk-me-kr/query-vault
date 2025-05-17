@@ -5,10 +5,7 @@ import { ConversationService } from '../domain/service';
 export class GetTurnPairsUseCase {
 	constructor(private readonly conversationService: ConversationService) {}
 
-	async execute(conversationId: number, turn: number) {
-		return this.conversationService.findPairsByConversationTurn(
-			conversationId,
-			turn,
-		);
+	async execute(conversationId: number) {
+		return this.conversationService.findAllTurns(conversationId);
 	}
 }
