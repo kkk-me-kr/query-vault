@@ -78,7 +78,7 @@ export class DocumentChunkChromaRepository
 					metadata: extraMetadata,
 				};
 			});
-			results = chunks;
+			results.push(...chunks);
 		}
 		return results;
 	}
