@@ -6,7 +6,6 @@ import * as Handlebars from 'handlebars';
 import { LlmService } from '@/shared/services/llm/service';
 import { resolve } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { QueriedChunkType } from '@/document/domain/repositories/document-chunk.repository';
 
 @Injectable()
 export class CreateTurnUseCase {

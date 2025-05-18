@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import path from 'path';
 import { Document } from '@/document/domain/entities/document.entity';
 import { Conversation } from '@/conversation/domain/entities/conversation.entity';
 import { Question } from '@/conversation/domain/entities/question.entity';
