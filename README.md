@@ -1,98 +1,83 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# QueryVault
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> 누구나 자신만의 지식 기반 챗봇을 만들고 공유할 수 있는 RAG 기반 Q&A 시스템
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+**이 시스템이 이용된 사례**
+- [www.kkk.me.kr](https://github.com/kkk-me-kr/kkk-frontend)
 
-## Description
+## 🔍 소개
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+인간의 뇌는 1m³당 1페타바이트의 정보를 담을 수 있다고 알려져있습니다.
+그럼에도 우리는 방금 전에 놓았던 스마트폰의 위치도 종종 까먹곤 하죠.
 
-## Project setup
+그런 이유로 만들어진 **QueryVault**는 사용자가 업로드한 문서를 바탕으로 대화를 나눌 수 있는 **RAG(Retrieval-Augmented Generation)** 기반의 챗봇 시스템입니다.
+새로 얻은 지식만 문서화하여 남겨둔다면, 언제든 LLM이 사용자의 실제 문서 데이터를 기반으로 하여 **정확도 높고 신뢰 가능한 답변**을 제공할 수 있습니다.
 
-```bash
-$ npm install
-```
+문뜩 떠오른 질문들을 던져봤더니, 아차! 싶었던 정보들이 술술 나오길 바라며 이 프로젝트를 기획하게 되었습니다.
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## 🧠 기술 스택
 
-# watch mode
-$ npm run start:dev
+| 구성 요소       | 기술 |
+|----------------|------|
+| Framework         | Nest.js |
+| Vector DB        | Chroma |
+| RDB            | MySQL |
+| LLM            | OpenAI GPT-4.1 |
+| Embedding    | [BAAI/bge-m3](https://huggingface.co/Xenova/bge-m3) |
+| document examples | 이력서, 블로그, 기술 문서, 회사 소개, 사규 등 |
 
-# production mode
-$ npm run start:prod
-```
+---
 
-## Run tests
+## 🛠 주요 기능
+
+- 문서 업로드 및 자동 청크 분할
+- Pretained 모델을 통한 임베딩 생성
+- 문서 기반 검색 및 GPT를 통한 답변 생성
+- 사용자 세션별 대화 저장
+- 프로젝트/문서 단위 RAG 답변 제한 기능
+
+---
+
+## 📁 폴더 구조
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+.
+├── db/migrations/      # DB 마이그레이션
+├── docker/
+│   ├── chroma          # Vector DB docker-compose
+│   └── mysql           # RDB docker-compose
+├── src/
+│   ├── conversation/
+│   └── document/
+│                  ├── application/    # 비즈니스 로직이 담긴 유스케이스
+│                  ├── domain/         # 도메인 로직 및 모델
+│                  ├── infrastructure/ # 외부 서비스 및 도메인 레포지토리의 구현체
+│                  └── interface/      # 접근 가능한 인터페이스 (http, graphql ...)
+├── shared/
+│   └── embeddings/     # 벡터 생성기 (BGE-M3)
+│   └── llm/            # LLM (openai)
+│   └── prompts/        # LLM에게 입력될 프롬프트 템플릿
+│
+└── main.ts
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 🗺️ 향후 계획
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- [ ] **PDF 등 TXT, MD외 파일 문서화 지원**
+- [ ] **파일 업로드 → 자동 문서화 파이프라인**
+- [ ] **프롬프트 커스터마이징 (질문 톤, 스타일 등)**
+- [ ] **RAG 검색 결과 하이라이트 및 인용 표시**
+- [ ] **외부 웹페이지 / 블로그 자동|수동 크롤링 기능**
+- [ ] **메타데이터 구조화**
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+## 👤 만든 이
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**김광권 (Kwangkwon Kim)**  
+- GitHub: [@KKK](https://github.com/KIMKWANGKWON)
+- Email: rlarhkdrnjs02@gmail.com
 
-## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
