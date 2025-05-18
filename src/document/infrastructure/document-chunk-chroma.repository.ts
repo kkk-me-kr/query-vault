@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ChromaClient, Collection, QueryResponse } from 'chromadb';
 import {
 	DocumentChunkRepository,
@@ -6,12 +6,15 @@ import {
 } from '../domain/repositories/document-chunk.repository';
 
 @Injectable()
-export class DocumentChunkChromaRepository extends DocumentChunkRepository {
+export class DocumentChunkChromaRepository
+	extends DocumentChunkRepository
+	implements OnModuleInit
+{
 	private client: ChromaClient;
 	private collection: Collection;
 	private readonly collectionName = 'document_chunks';
 
-	private async loadCollection() {
+	async onModuleInit() {
 		try {
 			this.client = new ChromaClient();
 			this.collection = await this.client.getOrCreateCollection({
@@ -27,6 +30,7 @@ export class DocumentChunkChromaRepository extends DocumentChunkRepository {
 			console.error('Error initializing Chroma collection', error);
 			throw error;
 		}
+		console.log('Chroma collection initialized');
 	}
 
 	private queryToEntities(response: QueryResponse): QueriedChunkType[] {

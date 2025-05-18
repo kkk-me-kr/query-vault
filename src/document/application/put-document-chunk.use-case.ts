@@ -57,7 +57,6 @@ export class PutDocumentChunkUseCase {
 			}),
 		);
 
-		console.log(chunckedData);
 		// NOTE: 기존에 청크가 있는 경우 삭제될겁니다.
 		await this.documentChunkService.deleteDocumentChunks(documentId);
 
