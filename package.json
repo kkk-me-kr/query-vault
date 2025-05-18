@@ -25,6 +25,7 @@
 		"migration:revert": "npm run typeorm -- migration:revert -d typeorm.config.ts"
 	},
 	"dependencies": {
+		"@huggingface/transformers": "^3.5.1",
 		"@langchain/core": "^0.3.55",
 		"@langchain/textsplitters": "^0.1.0",
 		"@nestjs/axios": "^4.0.0",
