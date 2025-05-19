@@ -89,8 +89,14 @@ export class ConversationService {
 		return turns;
 	}
 
-	async checkExists(conversationId: number): Promise<boolean> {
+	async checkExists(
+		conversationId: number,
+		userId?: string,
+	): Promise<boolean> {
 		const conversation = await this.repository.findById(conversationId);
+		if (userId) {
+			return conversation?.userId === userId;
+		}
 		return conversation !== null;
 	}
 }

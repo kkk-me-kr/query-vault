@@ -8,12 +8,14 @@ import {
 	Body,
 	Controller,
 	Get,
+	Headers,
 	Param,
 	ParseIntPipe,
 	Post,
 	Query,
 } from '@nestjs/common';
 
+// TODO: USER_ID Guard 적용
 @Controller('conversations')
 export class ConversationController {
 	constructor(
@@ -23,11 +25,11 @@ export class ConversationController {
 		private readonly getQuestionsUseCase: GetQuestionsUseCase,
 		private readonly getAnswersUseCase: GetAnswersUseCase,
 		private readonly getTurnPairsUseCase: GetTurnPairsUseCase,
-	) {}
+	) { }
 
 	@Post()
 	async createConversation(
-		@Body('userId') userId: string,
+		@Headers('x-user-id') userId: string,
 		@Body('title') title: string | undefined,
 	) {
 		return this.createConversationUseCase.execute(userId, title);
@@ -36,28 +38,22 @@ export class ConversationController {
 	@Post(':id/turns')
 	async query(
 		@Param('id', ParseIntPipe) id: number,
+		@Headers('x-user-id') userId: string | undefined,
 		@Body('query') query: string,
 	) {
-		return this.queryUseCase.execute(id, query);
+		return this.queryUseCase.execute(id, { query, userId: userId });
 	}
 
 	@Get()
-	async getUserConversations(@Query('userId') userId: string) {
+	async getUserConversations(@Headers('x-user-id') userId: string) {
 		return this.getUserConversationsUseCase.execute(userId);
 	}
 
-	@Get(':id/questions')
-	async getQuestions(@Param('id', ParseIntPipe) id: number) {
-		return this.getQuestionsUseCase.execute(id);
-	}
-
-	@Get(':id/answers')
-	async getAnswers(@Param('id', ParseIntPipe) id: number) {
-		return this.getAnswersUseCase.execute(id);
-	}
-
 	@Get(':id/turns')
-	async getTurnPairs(@Param('id', ParseIntPipe) id: number) {
-		return this.getTurnPairsUseCase.execute(id);
+	async getTurnPairs(
+		@Param('id', ParseIntPipe) id: number,
+		@Headers('x-user-id') userId: string | undefined,
+	) {
+		return this.getTurnPairsUseCase.execute(id, userId);
 	}
 }

@@ -6,6 +6,8 @@ import * as Handlebars from 'handlebars';
 import { LlmService } from '@/shared/services/llm/service';
 import { resolve } from 'path';
 import { ConfigService } from '@nestjs/config';
+import { Question } from '../domain/entities/question.entity';
+import { Answer } from '../domain/entities/answer.entity';
 
 @Injectable()
 export class CreateTurnUseCase {
@@ -75,57 +77,18 @@ export class CreateTurnUseCase {
 		}, Infinity);
 	}
 
-	async execute(conversationId: number, query: string) {
-		if (!(await this.conversationService.checkExists(conversationId))) {
-			throw new NotFoundException('Conversation not found');
-		}
-
-		const nextTurn =
-			await this.conversationService.findNextTurn(conversationId);
-
-		// NOTE: 사용자의 질의문을 압축합니다.
-		const compressedQuery = await this.compressQuery(query);
-
-		const retrievedDataByQuery =
-			await this.retrieveAllDocumentUseCase.execute(query);
-		const retrievedDataByCompressedQuery =
-			await this.retrieveAllDocumentUseCase.execute(compressedQuery);
-
-		const retrievedData = [
-			...retrievedDataByQuery,
-			...retrievedDataByCompressedQuery,
-		];
-
-		const contexts = retrievedData.reduce(
-			(acc, cur) => {
-				// 중복 제거
-				const filteredChunks = cur.matchedChunks.filter(
-					chunk => !acc.find(context => context.text === chunk.content),
-				);
-				const contexts = filteredChunks.map(chunk => ({
-					text: chunk.content,
-					metadata: {
-						documentTitle: cur.title,
-						source: cur.source,
-						...chunk.metadata,
-					},
-				}));
-
-				return [...acc, ...contexts];
-			},
-			[] as {
-				text: string;
-				metadata: Record<string, any>;
-			}[],
+	private async getRetrievedData(queries: string[]) {
+		const retrievedData = await Promise.all(
+			queries.map(async query => {
+				const retrievedData =
+					await this.retrieveAllDocumentUseCase.execute(query);
+				return retrievedData;
+			}),
 		);
+		return retrievedData.flat();
+	}
 
-		if (contexts.length === 0) {
-			console.log('No contexts found', `query: ${query}`);
-			return 'I’m sorry, but I don’t have that information.';
-		}
-
-		const previousTurns =
-			await this.conversationService.findAllTurns(conversationId);
+	private async generateAnswer(query, contexts: { text: string; metadata: Record<string, any> }[], previousTurns: { question: Question; answer: Answer | undefined }[]) {
 		const previousTurnsPrompt = previousTurns.map(turn => {
 			return {
 				question: turn.question.content,
@@ -143,11 +106,60 @@ export class CreateTurnUseCase {
 			previousTurns: previousTurnsPrompt,
 		});
 
-		const answerContent = await this.llmService.generateAnswer(
+		const answer = await this.llmService.generateAnswer(
 			systemPrompt,
 			userPrompt,
 		);
 
+		return answer;
+	}
+
+
+	async execute(
+		conversationId: number,
+		{ query, userId }: { query: string; userId: string | undefined | null },
+	) {
+		if (!userId || !(await this.conversationService.checkExists(conversationId, userId))) {
+			throw new NotFoundException('Conversation not found');
+		}
+
+		const nextTurn =
+			await this.conversationService.findNextTurn(conversationId);
+
+		// NOTE: 사용자의 질의문을 압축합니다.
+		const compressedQuery = await this.compressQuery(query);
+		const retrievedData = await this.getRetrievedData([query, compressedQuery]);
+
+		const contexts = retrievedData.reduce(
+			(acc, cur) => {
+				// 중복 제거
+				const filteredChunks = cur.matchedChunks.filter(
+					chunk => !acc.find(context => context.text === chunk.content),
+				);
+				// 원본 텍스트외 모두 메타데이터 취급
+				const contexts = filteredChunks.map(chunk => ({
+					text: chunk.content,
+					metadata: {
+						documentTitle: cur.title,
+						source: cur.source,
+						...chunk.metadata,
+					},
+				}));
+
+				return [...acc, ...contexts];
+			},
+			[] as {
+				text: string;
+				metadata: Record<string, any>;
+			}[],
+		);
+
+		const previousTurns =
+			await this.conversationService.findAllTurns(conversationId);
+
+		const answerContent = await this.generateAnswer(query, contexts, previousTurns);
+
+		// TODO: Transaction
 		await this.conversationService.postQuestion(
 			conversationId,
 			nextTurn,
