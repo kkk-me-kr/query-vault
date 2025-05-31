@@ -1,4 +1,6 @@
-prior conversation (each item has Q(Question), A(Answer)):
+당신이 확인할 수 있는 정보는 아래와 같습니다.
+
+이전 대화 목록: (각각의 대화는 Q(질문)과 A(답변)으로 이뤄짐):
 {{#each previousTurns}}
 	- Q:
 	{{this.question}}
@@ -6,11 +8,11 @@ prior conversation (each item has Q(Question), A(Answer)):
 		- A:
 		{{this.answer}}
 	{{else}}
-		- A: (No answer provided)
+		- A: (답변없음)
 	{{/if}}
 {{/each}}
 
-your answer. Context (each item has text + optional metadata):
+제공된 정보 (각각의 정보는 문구와 부가정보로 이뤄짐):
 {{#each contexts}}
 	- Text:
 	{{this.text}}
@@ -25,11 +27,5 @@ your answer. Context (each item has text + optional metadata):
 	{{/if}}
 {{/each}}
 
-Question:
+사용자의 질문:
 {{question}}
-
-Please provide a **concise, accurate answer** in the **same language** as the
-question, strictly based on the above context but also make sure to reference
-the previous conversation when relevant. You may refer to the metadata (e.g.,
-source, type, section) to judge relevance or reliability, but do **NOT**
-disclose any information not contained in the provided context.
