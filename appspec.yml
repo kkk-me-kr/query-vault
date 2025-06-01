@@ -1,0 +1,23 @@
+version: 0.0
+
+os: linux 
+
+files:
+  - source: /
+    destination: /home/ubuntu/projects/query-vault
+file_exists_behavior: OVERWRITE
+
+permissions:
+  - object: /home/ubuntu/projects/query-vault
+    pattern: '**'
+    owner: ubuntu
+    group: ubuntu
+    mode: 755
+    type:
+      - directory
+
+hooks:
+  ApplicationStart:
+    - location: deploy/run.sh
+      # DEFAULT 
+      timeout: 3600
